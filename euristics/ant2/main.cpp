@@ -58,8 +58,8 @@ int startEuristic(int iterations, int colonySize) {
 		for (auto ant : ants) ant.walkback(pheromoneMap);
 		
 		//evaporation
-		for (auto neighborhood : pheromoneMap)
-			for (auto &edge : neighborhood) edge = edge * (1 - EVAPORATION_RATE);
+		for (auto neighbourhood : pheromoneMap)
+			for (auto &edge : neighbourhood) edge = edge * (1 - EVAPORATION_RATE);
 	}
 	
 	return 0;
@@ -90,6 +90,25 @@ void Ant::reset() {
 }
 
 void Ant::findpath(array<array<double> > pheromoneMap) {
+	int current = -1;
+	
+	for (auto &step : path) {
+		//always start from 0
+		if (current == 0) {
+			step = 0;
+			visited[0] = true;
+			current = 0;
+			continue;
+		}
+
+		double totPheromone = 0.0;
+		for (int neighbour = 0; neighbour != numberOfLocations; neighbour++) {
+if (not visited[neighbour]) totPheromone += pheromoneMap[current][neighbour];
+		}
+		
+		//roundrobin
+		
+	}
 }
 
 void Ant::walkback(array<array<double> > pheromoneMap) {
