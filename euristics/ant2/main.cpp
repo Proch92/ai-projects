@@ -21,7 +21,7 @@ class Ant {
 		~Ant();
 		void reset();
 		void findpath(vector<vector<double>>);
-		void walkback(vector<vector<double>>, double);
+		void walkback(vector<vector<double>>&, double);
 		double tourFitness();
 	private:
 		int pickStepLinear(int);
@@ -39,7 +39,7 @@ typedef struct {
 //globals
 int numberOfLocations;
 Location* locations;
-vector<vector<double>> distances;
+double** distances;
 
 //starts the computation
 int startEuristic(int iterations, int colonySize) {
@@ -48,15 +48,18 @@ int startEuristic(int iterations, int colonySize) {
 	vector<Ant> ants (colonySize);
 
 	//creating the pheromone map
+	cout << "creating pheromone map" << endl;
 	vector<vector<double>> pheromoneMap(numberOfLocations, vector<double>(numberOfLocations, 0.0));
 
 	//starting iterations
-	for (int iter=0; iter != iterations; iter++) {
+	cout << "starting iterations" << endl;
+	for (int iter=0; iter < iterations; iter++) {
+		cout << "iter: " << iter << endl;
 		//reinitialize ants
 		for (auto &ant : ants) ant.reset();
 
 		//ants path finding
-		vector<future<void>> tasks;
+		//vector<future<void>> tasks;
 		//for (auto &ant : ants) tasks.insert(async([ant, &pheromoneMap]{ant.findpath(pheromoneMap)}));
 		//for (auto &task : tasks) task.get();
 		for (auto &ant : ants) ant.findpath(pheromoneMap);
@@ -67,10 +70,13 @@ int startEuristic(int iterations, int colonySize) {
 			auto tour = ant.tourFitness();
 			if (tour < bestTour) bestTour = tour;
 		}
+		cout << "best tour fitness " << bestTour << endl;
+
 		//each ant adds up his pheromone
 		for (auto &ant : ants) ant.walkback(pheromoneMap, bestTour);
 		
 		//evaporation
+			cout << "evaporation" << endl;
 		for (auto &neighbourhood : pheromoneMap)
 			for (auto &edge : neighbourhood) edge = pow(edge, EVAPORATION_RATE);
 	}
@@ -86,6 +92,12 @@ void loadData(const char* path) {
 	locations = (Location*) malloc(sizeof(Location) * numberOfLocations);
 	fread(locations, sizeof(Location), numberOfLocations, datafile);
 	fclose(datafile);
+
+
+	distances = (double**) malloc(sizeof(double*) * numberOfLocations);
+	for (int i=0; i!=numberOfLocations; i++) {
+		distances[i] = (double*) malloc(sizeof(double) * numberOfLocations);
+	}
 
 	for (int i=0; i!=numberOfLocations; i++)	{
 		for (int j=0; j!=numberOfLocations; j++) {
@@ -112,7 +124,7 @@ void Ant::reset() {
 
 void Ant::findpath(vector<vector<double>> pheromoneMap) {
 	int current = 0;
-	visited[0]; //first step is always 0
+	visited[0] = true; //first step is always 0
 	int nstep = 1;
 
 	for (auto &step : path) {
@@ -123,7 +135,7 @@ void Ant::findpath(vector<vector<double>> pheromoneMap) {
 		}
 		
 		//roundrobin
-		//no pheromone on the road. select randomly
+		//no pheromone on the road -> select randomly
 		//otherwise proceed with the roundrobin random selection
 		if (totPheromone == 0) {
 			step = pickStepLinear(nstep);
@@ -137,16 +149,16 @@ void Ant::findpath(vector<vector<double>> pheromoneMap) {
 	}
 }
 
-void Ant::walkback(vector<vector<double>> pheromoneMap, double bestTour) {
-	double quality = tourFitness() / bestTour;
+void Ant::walkback(vector<vector<double>> &pheromoneMap, double bestTour) {
+	double quality = bestTour / tourFitness();
 
+	int current = 0;
 	for (int i=0; i!=numberOfLocations; i++) {
-		static int current = 0;
-
 		pheromoneMap[current][path[i]] += PHEROMONE_DEPOSIT * quality;
-
 		current = path[i];
 	}
+
+	pheromoneMap[current][0] += PHEROMONE_DEPOSIT * quality;
 }
 
 double Ant::tourFitness() {
@@ -167,12 +179,12 @@ int Ant::pickStepLinear(int nstep) {
 	uniform_int_distribution<> dis(1, stepsRemaining);
 	int ran = dis(randGen);
 
-	int i;
-	for (i=0; i<=ran;) {
-		if (not visited[i]) i++;
+	int i, j=0;
+	for (i=0; j<ran; i++) {
+		if (not visited[i]) j++;
 	}	
 
-	return i;
+	return i-1;
 }
 
 int Ant::pickStepRR(vector<vector<double>> pheromoneMap, double totPheromone, int current) {
@@ -184,13 +196,13 @@ int Ant::pickStepRR(vector<vector<double>> pheromoneMap, double totPheromone, in
 		if (not visited[i]) ran -= pheromoneMap[current][i];
 	}
 
-	return i;
+	return i-1;
 }
 
 //main//////////////////////////////////
 int main(int argc, char** argv) {
 	if (argc != 4) {
-		cout << "usage: tspACO iterations colony_size datafile" << endl;
+		cout << "usage: " << argv[0] << " iterations colony_size datafile" << endl;
 		exit(1);
 	}
 
