@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <iostream>
 #include <vector>
-#include <vector>
 #include <future>
+#include <thread>
 #include <random>
 #include <stdlib.h>
 #include <omp.h>
@@ -60,10 +60,9 @@ int startEuristic(int iterations, int colonySize) {
 		for (auto &ant : ants) ant.reset();
 
 		//ants path finding
-		//vector<future<void>> tasks;
-		//for (auto &ant : ants) tasks.push_back(async([&ant, &pheromoneMap]{ant.findpath(pheromoneMap);}));
-		//for (auto &task : tasks) task.get();
-		for (auto &ant : ants) ant.findpath(pheromoneMap);
+		vector<thread> tasks;
+		for (auto &ant : ants) tasks.push_back(thread(&Ant::findpath, &ant, pheromoneMap));
+		for (auto &task : tasks) task.join();
 
 		//update pheromone
 		//evaporation
