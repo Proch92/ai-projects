@@ -11,7 +11,8 @@
 using namespace std;
 
 //const
-#define EVAPORATION_RATE 0.5 //exponential pow(pheromone, avaporation)
+#define EVAPORATION_RATE 0.5
+#define MIN_PHEROMONE 0.1
 #define PHEROMONE_DEPOSIT 1
 
 //definitions
@@ -49,7 +50,7 @@ int startEuristic(int iterations, int colonySize) {
 
 	//creating the pheromone map
 	cout << "creating pheromone map" << endl;
-	vector<vector<double>> pheromoneMap(numberOfLocations, vector<double>(numberOfLocations, 0.0));
+	vector<vector<double>> pheromoneMap(numberOfLocations, vector<double>(numberOfLocations, MIN_PHEROMONE));
 
 	//starting iterations
 	cout << "starting iterations" << endl;
@@ -77,8 +78,12 @@ int startEuristic(int iterations, int colonySize) {
 		
 		//evaporation
 			cout << "evaporation" << endl;
-		for (auto &neighbourhood : pheromoneMap)
-			for (auto &edge : neighbourhood) edge = pow(edge, EVAPORATION_RATE);
+		for (auto &neighbourhood : pheromoneMap) {
+			for (auto &edge : neighbourhood) {
+				edge *= EVAPORATION_RATE;
+				if (edge < MIN_PHEROMONE) edge = MIN_PHEROMONE;
+			}
+		}
 	}
 	
 	return 0;
@@ -135,13 +140,7 @@ void Ant::findpath(vector<vector<double>> pheromoneMap) {
 		}
 		
 		//roundrobin
-		//no pheromone on the road -> select randomly
-		//otherwise proceed with the roundrobin random selection
-		if (totPheromone == 0) {
-			step = pickStepLinear(nstep);
-		} else {
-			step = pickStepRR(pheromoneMap, totPheromone, current);
-		}
+		step = pickStepRR(pheromoneMap, totPheromone, current);
 
 		visited[step] = true;
 		current = step;
@@ -172,19 +171,6 @@ double Ant::tourFitness() {
 	}
 
 	return fitness;
-}
-
-int Ant::pickStepLinear(int nstep) {
-	int stepsRemaining = numberOfLocations - nstep;
-	uniform_int_distribution<> dis(1, stepsRemaining);
-	int ran = dis(randGen);
-
-	int i, j=0;
-	for (i=0; j<ran; i++) {
-		if (not visited[i]) j++;
-	}	
-
-	return i-1;
 }
 
 int Ant::pickStepRR(vector<vector<double>> pheromoneMap, double totPheromone, int current) {
