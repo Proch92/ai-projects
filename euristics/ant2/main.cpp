@@ -12,6 +12,7 @@ using namespace std;
 
 //const
 #define EVAPORATION_RATE 0.5
+#define PHEROMONE_DEPOSIT 1
 
 //definitions
 class Ant {
@@ -20,7 +21,8 @@ class Ant {
 		~Ant();
 		void reset();
 		void findpath(vector<vector<double>>);
-		void walkback(vector<vector<double>>);
+		void walkback(vector<vector<double>>, double);
+		double tourFitness();
 	private:
 		int pickStepLinear(int);
 		int pickStepRR(vector<vector<double>>, double, int);
@@ -37,6 +39,7 @@ typedef struct {
 //globals
 int numberOfLocations;
 Location* locations;
+vector<vector<double>> distances;
 
 //starts the computation
 int startEuristic(int iterations, int colonySize) {
@@ -59,8 +62,13 @@ int startEuristic(int iterations, int colonySize) {
 		for (auto &ant : ants) ant.findpath(pheromoneMap);
 
 		//update pheromone
+		double bestTour = numeric_limits<double>::max();
+		for (auto &ant : ants) {
+			auto tour = ant.tourFitness();
+			if (tour < bestTour) bestTour = tour;
+		}
 		//each ant adds up his pheromone
-		for (auto &ant : ants) ant.walkback(pheromoneMap);
+		for (auto &ant : ants) ant.walkback(pheromoneMap, bestTour);
 		
 		//evaporation
 		for (auto &neighbourhood : pheromoneMap)
@@ -78,12 +86,18 @@ void loadData(const char* path) {
 	locations = (Location*) malloc(sizeof(Location) * numberOfLocations);
 	fread(locations, sizeof(Location), numberOfLocations, datafile);
 	fclose(datafile);
+
+	for (int i=0; i!=numberOfLocations; i++)	{
+		for (int j=0; j!=numberOfLocations; j++) {
+			distances[i][j] = sqrt(pow(locations[i].x - locations[j].x, 2) + pow(locations[i].y - locations[j].y, 2));
+		}
+	}
 }
 
 //ANT/////////////////////
 Ant::Ant() {
 	visited.resize(numberOfLocations);
-	path.resize(numberOfLocations);
+	path.resize(numberOfLocations - 1); //first step is always 0
 	reset();
 
 	random_device randGen;
@@ -97,19 +111,11 @@ void Ant::reset() {
 }
 
 void Ant::findpath(vector<vector<double>> pheromoneMap) {
-	int current = -1;
-	int nstep = 0;
-	
-	for (auto &step : path) {
-		nstep++;
-		//always start from 0
-		if (current == -1) {
-			step = 0;
-			visited[0] = true;
-			current = 0;
-			continue;
-		}
+	int current = 0;
+	visited[0]; //first step is always 0
+	int nstep = 1;
 
+	for (auto &step : path) {
 		//calc total pheromone of all paths the ant can take
 		double totPheromone = 0.0;
 		for (int neighbour = 0; neighbour != numberOfLocations; neighbour++) {
@@ -127,10 +133,33 @@ void Ant::findpath(vector<vector<double>> pheromoneMap) {
 
 		visited[step] = true;
 		current = step;
+		nstep++;
 	}
 }
 
-void Ant::walkback(vector<vector<double>> pheromoneMap) {
+void Ant::walkback(vector<vector<double>> pheromoneMap, double bestTour) {
+	double quality = tourFitness() / bestTour;
+
+	for (int i=0; i!=numberOfLocations; i++) {
+		static int current = 0;
+
+		pheromoneMap[current][path[i]] += PHEROMONE_DEPOSIT * quality;
+
+		current = path[i];
+	}
+}
+
+double Ant::tourFitness() {
+	double fitness = 0;
+	for (auto step : path) {
+		static int current = 0;
+
+		fitness += distances[current][step];
+
+		current = step;
+	}
+
+	return fitness;
 }
 
 int Ant::pickStepLinear(int nstep) {
