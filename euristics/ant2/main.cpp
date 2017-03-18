@@ -11,9 +11,10 @@
 using namespace std;
 
 //const
-#define EVAPORATION_RATE 0.5
-#define MIN_PHEROMONE 0.1
-#define PHEROMONE_DEPOSIT 1
+#define EVAPORATION_RATE 0.3
+#define MIN_PHEROMONE 0.01
+#define MAX_PHEROMONE 1000
+#define PHEROMONE_DEPOSIT 10
 
 //definitions
 class Ant {
@@ -22,10 +23,9 @@ class Ant {
 		~Ant();
 		void reset();
 		void findpath(vector<vector<double>>);
-		void walkback(vector<vector<double>>&, double);
+		void walkback(vector<vector<double>>&, double, double);
 		double tourFitness();
 	private:
-		int pickStepLinear(int);
 		int pickStepRR(vector<vector<double>>, double, int);
 
 		vector<bool> visited;
@@ -61,29 +61,35 @@ int startEuristic(int iterations, int colonySize) {
 
 		//ants path finding
 		//vector<future<void>> tasks;
-		//for (auto &ant : ants) tasks.insert(async([ant, &pheromoneMap]{ant.findpath(pheromoneMap)}));
+		//for (auto &ant : ants) tasks.push_back(async([&ant, &pheromoneMap]{ant.findpath(pheromoneMap);}));
 		//for (auto &task : tasks) task.get();
 		for (auto &ant : ants) ant.findpath(pheromoneMap);
 
 		//update pheromone
-		double bestTour = numeric_limits<double>::max();
-		for (auto &ant : ants) {
-			auto tour = ant.tourFitness();
-			if (tour < bestTour) bestTour = tour;
-		}
-		cout << "best tour fitness " << bestTour << endl;
-
-		//each ant adds up his pheromone
-		for (auto &ant : ants) ant.walkback(pheromoneMap, bestTour);
-		
 		//evaporation
-			cout << "evaporation" << endl;
 		for (auto &neighbourhood : pheromoneMap) {
 			for (auto &edge : neighbourhood) {
 				edge *= EVAPORATION_RATE;
 				if (edge < MIN_PHEROMONE) edge = MIN_PHEROMONE;
 			}
 		}
+
+		//best and worst tours
+		double bestTour = numeric_limits<double>::max();
+		for (auto &ant : ants) {
+			auto tour = ant.tourFitness();
+			if (tour < bestTour) bestTour = tour;
+		}
+		double worstTour = 0;
+		for (auto &ant : ants) {
+			auto tour = ant.tourFitness();
+			if (tour > worstTour) worstTour = tour;
+		}
+		cout << "best tour fitness " << bestTour << endl;
+		cout << "worst tour fitness " << worstTour << endl;
+
+		//each ant adds up his pheromone
+		for (auto &ant : ants) ant.walkback(pheromoneMap, bestTour, worstTour);
 	}
 	
 	return 0;
@@ -124,7 +130,6 @@ Ant::~Ant() {}
 
 void Ant::reset() {
 	for (auto &&v : visited) v = false;
-	for (auto &p : path) p = -1;
 }
 
 void Ant::findpath(vector<vector<double>> pheromoneMap) {
@@ -148,16 +153,20 @@ void Ant::findpath(vector<vector<double>> pheromoneMap) {
 	}
 }
 
-void Ant::walkback(vector<vector<double>> &pheromoneMap, double bestTour) {
-	double quality = bestTour / tourFitness();
+void Ant::walkback(vector<vector<double>> &pheromoneMap, double bestTour, double worstTour) {
+	double fitness = tourFitness();
+	double quality = (worstTour - fitness) / (worstTour - bestTour);
+	double deposit = PHEROMONE_DEPOSIT * quality;
 
 	int current = 0;
 	for (int i=0; i!=numberOfLocations; i++) {
-		pheromoneMap[current][path[i]] += PHEROMONE_DEPOSIT * quality;
+		pheromoneMap[current][path[i]] += deposit;
+		if (pheromoneMap[current][path[i]] > MAX_PHEROMONE) pheromoneMap[current][path[i]] = MAX_PHEROMONE;
 		current = path[i];
 	}
 
-	pheromoneMap[current][0] += PHEROMONE_DEPOSIT * quality;
+	pheromoneMap[current][0] += deposit;
+	if (pheromoneMap[current][0] > MAX_PHEROMONE) pheromoneMap[current][0] = MAX_PHEROMONE;
 }
 
 double Ant::tourFitness() {
