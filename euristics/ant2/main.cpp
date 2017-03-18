@@ -11,7 +11,7 @@
 using namespace std;
 
 //const
-#define EVAPORATION_RATE 0.5
+#define EVAPORATION_RATE 0.5 //exponential pow(pheromone, avaporation)
 #define PHEROMONE_DEPOSIT 1
 
 //definitions
@@ -72,7 +72,7 @@ int startEuristic(int iterations, int colonySize) {
 		
 		//evaporation
 		for (auto &neighbourhood : pheromoneMap)
-			for (auto &edge : neighbourhood) edge = edge * (1 - EVAPORATION_RATE);
+			for (auto &edge : neighbourhood) edge = pow(edge, EVAPORATION_RATE);
 	}
 	
 	return 0;
