@@ -60,9 +60,9 @@ int startEuristic(int iterations, int colonySize) {
 		for (auto &ant : ants) ant.reset();
 
 		//ants path finding
-		vector<thread> tasks;
-		for (auto &ant : ants) tasks.push_back(thread(&Ant::findpath, &ant, pheromoneMap));
-		for (auto &task : tasks) task.join();
+		vector<future<void>> tasks;
+		for (auto &ant : ants) tasks.push_back(async(launch::async, &Ant::findpath, &ant, pheromoneMap));
+		for (auto &task : tasks) task.get();
 
 		//update pheromone
 		//evaporation
