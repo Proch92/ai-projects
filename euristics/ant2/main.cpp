@@ -14,7 +14,7 @@ using namespace std;
 #define EVAPORATION_RATE 0.3
 #define MIN_PHEROMONE 0.01
 #define MAX_PHEROMONE 1000
-#define PHEROMONE_DEPOSIT 10
+#define PHEROMONE_DEPOSIT 5
 
 //definitions
 class Ant {
@@ -85,7 +85,6 @@ int startEuristic(int iterations, int colonySize) {
 			if (tour > worstTour) worstTour = tour;
 		}
 		cout << "best tour fitness " << bestTour << endl;
-		cout << "worst tour fitness " << worstTour << endl;
 
 		//each ant adds up his pheromone
 		for (auto &ant : ants) ant.walkback(pheromoneMap, bestTour, worstTour);
