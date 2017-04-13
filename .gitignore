@@ -35,3 +35,11 @@
 euristics/ant2/ant
 
 euristics/ant2/data1
+
+*.swp
+
+*.un~
+
+nn/__pycache__/
+
+*.py~
