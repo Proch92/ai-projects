@@ -41,10 +41,12 @@ model.compile(loss='categorical_crossentropy',
         optimizer='adam',
         metrics=['accuracy'])
 
-from keras.utils import plot_model
-plot_model(model, to_file='model.png')
+#from keras.utils import plot_model
+#plot_model(model, to_file='model.png')
 
 
 model.fit(x_train, y_train, batch_size=32, nb_epoch=10, verbose=1)
 
 score = model.evaluate(x_test, y_test, verbose=0)
+
+print(score)
