@@ -43,3 +43,5 @@ euristics/ant2/data1
 nn/__pycache__/
 
 *.py~
+
+serie/bazel-bin
