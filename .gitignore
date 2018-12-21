@@ -45,3 +45,4 @@ nn/__pycache__/
 *.py~
 
 *bazel*
+serie/third_party/tensorflow
