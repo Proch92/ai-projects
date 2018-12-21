@@ -33,6 +33,9 @@ SimpleDNN::SimpleDNN() {
     auto loss = Sub(scope, out, y);
 }
 
-void SimpleDNN::train(Dataset dataset) {
+SimpleDNN::~SimpleDNN() {
 
+}
+
+void SimpleDNN::train(Dataset dataset) {
 }

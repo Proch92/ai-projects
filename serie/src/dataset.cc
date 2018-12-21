@@ -11,6 +11,10 @@ Dataset::Dataset(string filename) {
     x = readCSV(filename);
 }
 
+Dataset::~Dataset() {
+
+}
+
 vector<float> Dataset::readCSV(string filename) {
     ifstream file(filename);
 
