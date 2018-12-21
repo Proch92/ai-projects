@@ -1,14 +1,17 @@
+#include <vector>
+#include <string>
+
 using namespace std;
 
-public class Dataset
+class Dataset
 {
 public:
-    Dataset(string filename);
+    Dataset(string);
     ~Dataset();
 
     vector<float> get_data() {return x;}
 
 private:
-    vector<float> readCSV(string filename);
+    vector<float> readCSV(string);
     vector<float> x;
 };

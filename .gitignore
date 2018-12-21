@@ -44,4 +44,4 @@ nn/__pycache__/
 
 *.py~
 
-serie/bazel-bin
+*bazel*

@@ -1,7 +1,7 @@
-class Model
+class SimpleDNN
 {
 public:
-    Model();
-    ~Model();
+    SimpleDNN();
+    ~SimpleDNN();
     void train(Dataset);
 };

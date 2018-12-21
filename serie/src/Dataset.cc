@@ -1,10 +1,13 @@
 #include <vector>
 #include <fstream>
-#include "Dataset.h"
+#include <sstream>
+#include <iostream>
+#include <string>
+#include "dataset.h"
 
 using namespace std;
 
-void Dataset::Dataset(string filename) {
+Dataset::Dataset(string filename) {
     x = readCSV(filename);
 }
 
@@ -14,8 +17,10 @@ vector<float> Dataset::readCSV(string filename) {
     stringstream buffer;
     buffer << file.rdbuf();
     vector<float> points;
-    float point;
+    string point;
     while(getline(buffer, point, ',')) {
         points.push_back(stod(point));
     }
+
+    return points;
 }
