@@ -7,10 +7,11 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        cout << "usage: ./" << argv[0] << " csv_filename";
+        cout << "usage: ./" << argv[0] << " csv_filename" << endl;
         return 1;
     }
 
+    printf("loading dataset\n");
     string filename(argv[1]);
     Dataset dataset(filename);
 
