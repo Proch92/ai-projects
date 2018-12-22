@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
-        cout << "usage: ./" << argv[0] << " csv_filename" << endl;
+        cout << "usage: ./" << argv[0] << " csv_filename epochs" << endl;
         return 1;
     }
 
@@ -16,7 +16,7 @@ int main(int argc, char* argv[]) {
     Dataset dataset(filename);
 
     SimpleDNN model;
-    model.train(dataset);
+    model.train(dataset, atoi(argv[2]));
 
     return 0;
 }
