@@ -7,5 +7,4 @@ public:
     ~SimpleDNN();
     void train(Dataset, int);
 private:
-	tensorflow::Scope scope;
 };
