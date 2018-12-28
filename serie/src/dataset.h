@@ -14,6 +14,11 @@ public:
     pair<vector<float>, vector<float>> get_batch_sliding_window(int);
 
 private:
-    vector<float> readCSV(string);
+    void readCSV(string);
+    void preprocess();
+    float normalize(float);
+    float denormalize(float);
+
     vector<float> data;
+    float min, max, span;
 };

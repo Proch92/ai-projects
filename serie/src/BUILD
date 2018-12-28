@@ -5,8 +5,8 @@ tf_cc_binary(
     srcs = ["main.cc",
     		"dataset.cc",
     		"dataset.h",
-    		"model.cc",
-    		"model.h"],
+    		"simplednn.cc",
+    		"simplednn.h"],
     deps = [
         "@org_tensorflow//tensorflow/cc:gradients",
         "@org_tensorflow//tensorflow/cc:grad_ops",

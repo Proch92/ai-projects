@@ -4,7 +4,7 @@
 #include "tensorflow/cc/framework/gradients.h"
 
 #include "dataset.h"
-#include "model.h"
+#include "simplednn.h"
 #include <utility>
 #include <iostream>
 
@@ -69,7 +69,7 @@ void SimpleDNN::train(Dataset dataset, int epochs) {
 
     ClientSession session(scope);
 
-    //load data into tensors
+    //load data into input tensors
     cout << "loading data into tensors..." << endl;
     int window_size = 3;
     pair<vector<float>, vector<float>> batch = dataset.get_batch_sliding_window(window_size);

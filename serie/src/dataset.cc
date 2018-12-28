@@ -4,32 +4,53 @@
 #include <iostream>
 #include <string>
 #include <utility>
+#include <algorithm>
+
 #include "dataset.h"
 
 using namespace std;
 
 Dataset::Dataset(string filename) {
-    data = readCSV(filename);
+    readCSV(filename);
+    preprocess();
 }
 
 Dataset::~Dataset() {
-
 }
 
-vector<float> Dataset::readCSV(string filename) {
+void Dataset::readCSV(string filename) {
     ifstream file(filename);
 
     stringstream buffer;
     buffer << file.rdbuf();
-    vector<float> points;
     string point;
     while(getline(buffer, point, ',')) {
-        points.push_back(stod(point));
+        data.push_back(stod(point));
     }
 
-    cout << "CSV file: " << points.size() << " points loaded" << endl;
+    cout << "CSV file: " << data.size() << " points loaded" << endl;
+}
 
-    return points;
+float Dataset::normalize(float n) {
+    return (n + min) / span;
+}
+
+float Dataset::denormalize(float n) {
+    return (n * span) - min;
+}
+
+void Dataset::preprocess() {
+    //normalize points into a [0,1] range
+    min = *min_element(data.begin(), data.end());
+    max = *max_element(data.begin(), data.end());
+    span = max - min;
+
+    vector<float> normalized;
+    for (float n : data) {
+        normalized.push_back(normalize(n));
+    }
+
+    data = normalized;
 }
 
 pair<vector<float>, vector<float>> Dataset::get_batch_sliding_window(int window) {

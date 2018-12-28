@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include "dataset.h"
-#include "model.h"
+#include "simplednn.h"
 
 using namespace std;
 
@@ -15,8 +15,8 @@ int main(int argc, char* argv[]) {
     string filename(argv[1]);
     Dataset dataset(filename);
 
-    SimpleDNN model;
-    model.train(dataset, atoi(argv[2]));
+    SimpleDNN dnn;
+    dnn.train(dataset, atoi(argv[2]));
 
     return 0;
 }
