@@ -32,11 +32,11 @@ void Dataset::readCSV(string filename) {
 }
 
 float Dataset::normalize(float n) {
-    return (n + min) / span;
+    return (n - min) / span;
 }
 
 float Dataset::denormalize(float n) {
-    return (n * span) - min;
+    return (n * span) + min;
 }
 
 void Dataset::preprocess() {
