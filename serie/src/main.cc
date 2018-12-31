@@ -2,6 +2,7 @@
 #include <string>
 #include "dataset.h"
 #include "simplednn.h"
+#include "rnn.h"
 
 using namespace std;
 
@@ -16,7 +17,10 @@ int main(int argc, char* argv[]) {
     Dataset dataset(filename);
 
     SimpleDNN dnn;
-    dnn.train(dataset, atoi(argv[2]));
+    dnn.train(dataset, atoi(argv[2]), 5, 3);
+
+    Rnn rnn;
+    rnn.train(dataset, atoi(argv[2]), 3, 3);
 
     return 0;
 }

@@ -18,7 +18,7 @@ SimpleDNN::SimpleDNN() {
 SimpleDNN::~SimpleDNN() {
 }
 
-void SimpleDNN::train(Dataset dataset, int epochs) {
+void SimpleDNN::train(Dataset dataset, int epochs, int batch_size, int window_size) {
     cout << "training" << endl;
 
     auto scope = Scope::NewRootScope();
@@ -27,8 +27,8 @@ void SimpleDNN::train(Dataset dataset, int epochs) {
     auto x = Placeholder(scope, DT_FLOAT);
     auto y = Placeholder(scope, DT_FLOAT);
 
-    auto w_hidden = Variable(scope, {3, 3}, DT_FLOAT);
-    auto init_rand_w_hidden = Assign(scope, w_hidden, RandomNormal(scope, {3, 3}, DT_FLOAT));
+    auto w_hidden = Variable(scope, {window_size, 3}, DT_FLOAT);
+    auto init_rand_w_hidden = Assign(scope, w_hidden, RandomNormal(scope, {window_size, 3}, DT_FLOAT));
 
     auto b_hidden = Variable(scope, {1, 3}, DT_FLOAT);
     auto init_rand_b_hidden = Assign(scope, b_hidden, RandomNormal(scope, {1, 3}, DT_FLOAT));
@@ -64,22 +64,11 @@ void SimpleDNN::train(Dataset dataset, int epochs) {
     auto apply_b_hidden = ApplyGradientDescent(scope, b_hidden, Cast(scope, 0.01, DT_FLOAT), {grad_outputs[2]});
     auto apply_b_out = ApplyGradientDescent(scope, b_out, Cast(scope, 0.01, DT_FLOAT), {grad_outputs[3]});
     
-    
     cout << "graph created" << endl;
 
     ClientSession session(scope);
 
-    //load data into input tensors
-    cout << "loading data into tensors..." << endl;
-    int window_size = 3;
-    pair<vector<float>, vector<float>> batch = dataset.get_batch_sliding_window(window_size);
-    int batch_size = batch.first.size() / window_size;
-    cout << "...done. batch size = " << batch_size << endl;
-
-    Tensor data_x(DT_FLOAT, TensorShape{batch_size, window_size});
-    Tensor data_y(DT_FLOAT, TensorShape{batch_size, 1});
-    copy_n(batch.first.begin(), batch.first.size(), data_x.flat<float>().data());
-    copy_n(batch.second.begin(), batch.second.size(), data_y.flat<float>().data());
+    vector<Dataset::Batch> batches = dataset.get_batches_sliding_window(batch_size, window_size);
 
     //start training cycle
     cout << "randomly initializing weigths and bias..." << endl;
@@ -88,11 +77,18 @@ void SimpleDNN::train(Dataset dataset, int epochs) {
 
     vector<Tensor> output;
     for (int i=0; i!=epochs; i++) {
-        if (i%100 == 0) {
-            TF_CHECK_OK(session.Run({{x, data_x}, {y, data_y}}, {loss}, &output));
-            cout << "loss after " << i << " steps: " << output[0].scalar<float>() << endl;
-        }
+        for (auto batch : batches) {
+            Tensor tensor_x(DT_FLOAT, TensorShape{batch.y.size(), window_size});
+            Tensor tensor_y(DT_FLOAT, TensorShape{batch.y.size(), 1});
+            copy_n(batch.x.begin(), batch.x.size(), tensor_x.flat<float>().data());
+            copy_n(batch.y.begin(), batch.y.size(), tensor_y.flat<float>().data());
 
-        TF_CHECK_OK(session.Run({{x, data_x}, {y, data_y}}, {apply_w_hidden, apply_w_out, apply_b_hidden, apply_b_out}, nullptr));
+            if (i%100 == 0) {
+                TF_CHECK_OK(session.Run({{x, tensor_x}, {y, tensor_y}}, {loss}, &output));
+                cout << "loss after " << i << " steps: " << output[0].scalar<float>() << endl;
+            }
+
+            TF_CHECK_OK(session.Run({{x, tensor_x}, {y, tensor_y}}, {apply_w_hidden, apply_w_out, apply_b_hidden, apply_b_out}, nullptr));
+        }
     }
 }

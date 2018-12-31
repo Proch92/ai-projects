@@ -7,11 +7,17 @@ using namespace std;
 class Dataset
 {
 public:
+    struct Batch {
+        vector<float> x;
+        vector<float> y;
+    };
+
     Dataset(string);
     ~Dataset();
 
     vector<float> get_plain_data() {return data;}
-    pair<vector<float>, vector<float>> get_batch_sliding_window(int);
+    vector<Batch> get_batches_sliding_window(int batch_size, int window_size);
+    vector<Batch> get_batches(int batch_size, int window_size);
 
 private:
     void readCSV(string);

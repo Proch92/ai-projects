@@ -5,6 +5,6 @@ class Rnn
 public:
     Rnn();
     ~Rnn();
-    void train(Dataset, int);
+    void train(Dataset, int, int, int);
 private:
 };
