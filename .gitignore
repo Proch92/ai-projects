@@ -46,3 +46,5 @@ nn/__pycache__/
 
 *bazel*
 serie/third_party/tensorflow
+
+pyseries/src/__pycache__/
