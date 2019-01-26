@@ -1,42 +1,33 @@
 import csv
 import numpy as np
+import os
 
 
-class Dataset():
-	def __init__(self, filename):
-		self.filename = filename
-		self.data = list(self.load())
-		(self.size, self.mean, self.std) = self.stats()
-		self.normalize()
+def load(filename):
+	data = []
+	with open(os.path.join('data', self.filename), "r") as csvfile:
+		reader = csv.reader(csvfile, delimiter=',')
+		for row in reader:
+			for token in row:
+				data.append(float(token))
+
+	return np.array(data)
 
 
-	def sliding_window(self, window_size, stride = 1):
-		windows = int((self.size - (window_size + 1)) / stride) + 1
-		matrix = np.array([self.data[(i*stride) : (i*stride)+window_size] for i in range(windows)])
-		labels = np.array([self.data[(i*stride)+window_size] for i in range(windows)])
-
-		return (matrix, labels)
+def split(data, perc = 0.7):
+	data_size = len(data)
+	train_size = int(data_size * perc)
+	return (data[:train_size], data[train_size:])
 
 
-	def normalize(self):
-		self.data = [(point - self.mean) / self.std for point in self.data]
+def normalize(data):
+	mean = np.mean(data)
+	std = np.std(data)
+	return (np.vectorize(lambda p: (p-mean)/std) (data), mean, std)
 
 
-	def stats(self):
-		size = len(self.data)
-		mean = np.mean(self.data)
-		std = np.std(self.data)
-
-		return (size, mean, std)
-	
-
-	def load(self):
-		with open(self.filename, "r") as csvfile:
-			reader = csv.reader(csvfile, delimiter=',')
-			for row in reader:
-				for token in row:
-					yield float(token)
-
-
-	def toNumpy(self):
-		return np.array(data)
+def sliding_window(trainset, window_size, stride = 1):
+	windows = int((len(trainset) - (window_size + 1)) / stride) + 1
+	matrix = np.array([trainset[(i*stride) : (i*stride)+window_size] for i in range(windows)])
+	labels = np.array([trainset[(i*stride)+window_size] for i in range(windows)])
+	return (matrix, labels)

@@ -17,14 +17,14 @@ class Fnn():
 		])
 
 
-	def train(self, dataset, epochs = 1000, batch_size = 10):
+	def train(self, trainset, epochs = 1000, batch_size = 10):
 		optimizer = tf.keras.optimizers.RMSprop(0.001)
 
 		self.model.compile(loss='mse',
 				optimizer=optimizer,
-				metrics=['mae', 'mse'])
+				metrics=['mse'])
 
-		x, y = dataset.sliding_window(self.window_size)
+		x, y = dataset.sliding_window(trainset, self.window_size)
 		history = self.model.fit(x, y, epochs=epochs, validation_split = 0.2, verbose=0)
 
 		utils.plot_history(history)
