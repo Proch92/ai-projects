@@ -30,13 +30,6 @@ def denormalize(data, mean, std):
 	return np.vectorize(lambda p: (p * std) + mean) (data)
 
 
-def sliding_window(trainset, window_size, stride = 1):
-	windows = ((len(trainset) - (window_size + 1)) // stride) + 1
-	matrix = np.array([trainset[(i*stride) : (i*stride)+window_size] for i in range(windows)])
-	labels = np.array([trainset[(i*stride)+window_size] for i in range(windows)])
-	return (matrix, labels)
-
-
 def streamline(data):
 	if len(data) == 0:
 		return []

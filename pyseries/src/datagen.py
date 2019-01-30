@@ -2,12 +2,12 @@ import sys
 import os
 import math
 
-DATASET_SIZE = 1000
+DATASET_SIZE = 500
 
 
 def sin(i):
 	START = 0.0
-	STEPS = 0.1
+	STEPS =  (math.pi * 10) / DATASET_SIZE
 	return math.sin(START + (i * STEPS))
 
 

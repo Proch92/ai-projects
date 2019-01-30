@@ -1,5 +1,5 @@
 #from fnn import Fnn
-from rnn import Rnn
+from lstm import LSTM
 import datautils
 import utils
 import sys
@@ -22,13 +22,18 @@ def main():
 	print("training set length: {}".format(len(trainset)))
 	print("test set length: {}".format(len(testset)))
 
-	model = Rnn()
-	model.train(trainset, epochs=10, batch_size=10, time_steps=10)
-	results = model.evaluate(testset[:150], 150)
+	model = LSTM()
+	time_steps = 10
+	batch_size = 5
+	model.train(trainset, 50, batch_size, time_steps)
+
+	head = int(len(testset) * 0.6)
+	tail = len(testset) - head
+	results = model.evaluate(testset[:head], tail)
 	
 	testset_denorm = datautils.denormalize(testset, mean, std)
 	results_denorm = datautils.denormalize(results, mean, std)
-	utils.plot_multiple([testset_denorm, results_denorm])
+	utils.plot_multiple([testset_denorm, results_denorm], [0, head + time_steps])
 
 if __name__ == '__main__':
 	main()

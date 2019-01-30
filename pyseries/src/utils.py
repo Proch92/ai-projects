@@ -24,14 +24,17 @@ def plot_data(sequence):
 	plt.show()
 
 
-def plot_multiple(sequences):
+def plot_multiple(sequences, shift = None):
+	if not shift:
+		shift = [0] * len(sequences)
+
 	max_y = max([max(seq) for seq in sequences])
 	min_y = min([min(seq) for seq in sequences])
 
 	plt.figure()
 	plt.xlabel('Time')
 	plt.ylabel('Value')
-	for sequence in sequences:
-		plt.plot(range(len(sequence)), sequence)
+	for i, sequence in enumerate(sequences):
+		plt.plot([t + shift[i] for t in range(len(sequence))], sequence)
 	plt.ylim([min_y, max_y])
 	plt.show()
