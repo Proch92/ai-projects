@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
 	if len(argv) != 2:
 		print('Usage: datagen.py function_name')
-		exit(0)
+		sys.exit(0)
 
 	func = argv[1]
 

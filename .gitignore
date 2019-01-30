@@ -48,3 +48,5 @@ nn/__pycache__/
 serie/third_party/tensorflow
 
 pyseries/src/__pycache__/
+
+pyseries/training_checkpoints/
