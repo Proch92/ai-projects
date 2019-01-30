@@ -7,7 +7,7 @@ DATASET_SIZE = 1000
 
 def sin(i):
 	START = 0.0
-	STEPS = 0.01
+	STEPS = 0.1
 	return math.sin(START + (i * STEPS))
 
 

@@ -15,10 +15,23 @@ def plot_history(history):
 	plt.show()
 
 
-def plot_data(dataset):
+def plot_data(sequence):
 	plt.figure()
 	plt.xlabel('Time')
 	plt.ylabel('Value')
-	plt.plot(range(dataset.size), dataset.get_denormalized_data())
-	plt.ylim([dataset.min, dataset.max])
+	plt.plot(range(len(sequence)), sequence)
+	plt.ylim([min(sequence), max(sequence)])
+	plt.show()
+
+
+def plot_multiple(sequences):
+	max_y = max([max(seq) for seq in sequences])
+	min_y = min([min(seq) for seq in sequences])
+
+	plt.figure()
+	plt.xlabel('Time')
+	plt.ylabel('Value')
+	for sequence in sequences:
+		plt.plot(range(len(sequence)), sequence)
+	plt.ylim([min_y, max_y])
 	plt.show()
