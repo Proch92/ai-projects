@@ -1,4 +1,3 @@
-#from fnn import Fnn
 from lstm import LSTM
 import datautils
 import utils
@@ -13,27 +12,28 @@ def main():
 
 	data = datautils.load(argv[1])
 	normalized, mean, std = datautils.normalize(data)
-	trainset, testset = datautils.split(normalized, 0.7)
-#	utils.plot_data(trainset)
+	(train, validation, test) = datautils.split(normalized, 0.6, 0.2, 0.2)
 	
-#	model = Fnn(window_size=10)
-#	model.train(trainset, epochs=200)
+	utils.plot_data(data)
 
-	print("training set length: {}".format(len(trainset)))
-	print("test set length: {}".format(len(testset)))
+	print("training set length: {}".format(len(train)))
+	print("test set length: {}".format(len(test)))
 
+	"""train"""
 	model = LSTM()
-	time_steps = 10
-	batch_size = 5
-	model.train(trainset, 50, batch_size, time_steps)
+	time_steps = 20 # window size
+	batch_size = 1
+	model.train(train, validation, 500, batch_size, time_steps)
 
-	head = int(len(testset) * 0.6)
-	tail = len(testset) - head
-	results = model.evaluate(testset[:head], tail)
+	"""test"""
+	head = int(len(test) * 0.6)
+	tail = len(test) - head
+	(guided, projection) = model.evaluate(test[:head], tail)
 	
-	testset_denorm = datautils.denormalize(testset, mean, std)
-	results_denorm = datautils.denormalize(results, mean, std)
-	utils.plot_multiple([testset_denorm, results_denorm], [0, head + time_steps])
+	"""plot"""
+	testset_denorm = datautils.denormalize(test, mean, std)
+	results_denorm = datautils.denormalize(projection, mean, std)
+	utils.plot_multiple([testset_denorm, guided, results_denorm], [0, 1, head+1])
 
 if __name__ == '__main__':
 	main()

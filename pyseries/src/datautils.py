@@ -14,10 +14,11 @@ def load(filename):
 	return np.array(data)
 
 
-def split(data, perc = 0.7):
+def split(data, train, validation, test):
 	data_size = len(data)
-	train_size = int(data_size * perc)
-	return (data[:train_size], data[train_size:])
+	train_size = int(data_size * train)
+	validation_size = int(data_size * validation)
+	return (data[:train_size], data[train_size:train_size+validation_size], data[train_size+validation_size:])
 
 
 def normalize(data):
@@ -28,6 +29,20 @@ def normalize(data):
 
 def denormalize(data, mean, std):
 	return np.vectorize(lambda p: (p * std) + mean) (data)
+
+
+def differentiate(data):
+	new = np.concatenate((np.zeros(1), data[:-1]))
+	return new - data
+
+
+def undifferentiate(data):
+	v = 0
+	ret = []
+	for d in data:
+		v = v + d
+		ret.append(v)
+	return ret
 
 
 def streamline(data):
