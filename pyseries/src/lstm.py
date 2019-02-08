@@ -10,8 +10,7 @@ import os
 class LSTM():
 	"""Recurrent neural network"""
 	def __init__(self):
-		self.checkpoint_dir = './training_checkpoints'
-		self.checkpoint_prefix = os.path.join(self.checkpoint_dir, "ckpt_{epoch}")
+		pass
 
 
 	def model_definition(self, batch_size):
@@ -29,41 +28,37 @@ class LSTM():
 		])
 
 
-	def train(self, trainset, validationset, epochs, batch_size, time_steps):
-		num_sequences = len(trainset) // time_steps
-		sequences = self.preprocess_data(trainset, batch_size, time_steps)
-		num_val_sequences = len(validationset) // time_steps
-		val_sequences = self.preprocess_data(validationset, batch_size, time_steps)
+	def train(self, modelname, trainset, epochs, batch_size, time_steps):
+		(x, y) = self.prepare_data(trainset, batch_size, time_steps)
 
 		model = self.model_definition(batch_size)
 		model.compile(loss='mse',
 				optimizer=tf.train.RMSPropOptimizer(0.001),
 				metrics=['mse'])
 		model.summary()
-		checkpoint_callback = tf.keras.callbacks.ModelCheckpoint(filepath=self.checkpoint_prefix, save_weights_only=True)
 		
 		model.reset_states()
-		history = model.fit(sequences.repeat(),
+		history = model.fit(
+				x, 
+				y,
 				epochs=epochs,
-				steps_per_epoch=(num_sequences // batch_size),
+				batch_size=batch_size,
 				shuffle = False,
-				verbose=1,
-				callbacks=[checkpoint_callback],
-				validation_data=val_sequences.repeat(),
-				validation_steps=(num_val_sequences // batch_size))
+				verbose=1)
 
-		utils.plot_history(history)
+		self.save(os.path.join('models', modelname + '.h5'))
+
+		return history
 
 
-	def evaluate(self, testset, projection_length):
+	def evaluate(self, modelname, testset, projection_length):
 		input_tensor = tf.expand_dims(testset, 1) # adds features dimension
 		input_tensor = tf.expand_dims(input_tensor, 0) # adds batch dimension
 		input_tensor = tf.to_float(input_tensor)
 
 		model = self.model_definition(1)
-		model.load_weights(tf.train.latest_checkpoint(self.checkpoint_dir))
+		model.load_weights(os.path.join('models', modelname + '.h5'))
 		model.build(tf.TensorShape([1, None]))
-		model.summary()
 
 		projection = []
 		model.reset_states()
@@ -80,10 +75,52 @@ class LSTM():
 
 		return (guided, projection)
 
+	#####################################################
+	# 	(datalen)										#
+	# duplicate sequences batch_size times				#
+	# 	(batch_size, datalen)							#
+	# random rolls										#
+	# discard rolled points								#
+	# 	(batch_size, time_steps * num_cuts)				#
+	# expand dimension for LSTM							#
+	#	(batch_size, time_steps * num_cuts + 1, 1)		#
+	# decouple x and y									#
+	#	(batch_size, times_steps * num_cuts, 1)			#
+	# cut sequences into batches of time_steps length	#
+	#	(num_cuts * batch_size, times_steps, 1)			#
+	#####################################################
 
-	def preprocess_data(self, raw_data, batch_size, time_steps):
-		reshaped = tf.expand_dims(raw_data, 1)
-		dataset = tf.data.Dataset.from_tensor_slices(reshaped)
-		sequences = dataset.batch(time_steps+1, drop_remainder=True)
-		sequences = sequences.map(lambda sequence: (sequence[:-1], sequence[1:]))
-		return sequences.batch(batch_size, drop_remainder=True)
+	def prepare_data(self, data, batch_size, time_steps):
+		print("datalen: {}, batch_size: {}, time_steps: {}".format(len(data), batch_size, time_steps))
+		
+		# data augmentation. duplicating the sequence and rolling it to change the starting point. then batch-train all the sequences
+		sequences = [data for _ in range(batch_size)]
+		shifts = np.random.randint(time_steps, size=batch_size)
+		sequences = list(map(lambda batch, shift: np.roll(batch, -shift), sequences, shifts))
+		
+		# discard points that rolled over the end
+		num_cuts = (len(data) // time_steps) - 1
+		sequences = list(map(lambda batch: batch[:(num_cuts*time_steps)+1], sequences))
+		
+		# expanding dimension for lstm input space
+		sequences = np.expand_dims(sequences, axis=2)
+
+		# decoupling x and y
+		(x, y) = (sequences[:, :-1, :], sequences[:, 1:, :])
+
+		# cutting sequences of length time_steps. each cut block will train the model in an epoch
+		mapx = map(lambda i: x[:, time_steps*i:time_steps*(i+1), :], range(num_cuts))
+		mapy = map(lambda i: y[:, time_steps*i:time_steps*(i+1), :], range(num_cuts))
+		x = np.concatenate(list(mapx), axis=0)
+		y = np.concatenate(list(mapy), axis=0)
+
+		return (x, y)
+
+
+		def save(self, filename):
+			tf.keras.models.save_model(
+				model,
+				filepath,
+				overwrite=True,
+				include_optimizer=True
+			)

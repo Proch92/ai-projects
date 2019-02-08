@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 
-def plot_history(history):
+def plot_history(history, validation=False):
 	hist = pd.DataFrame(history.history)
 	hist['epoch'] = history.epoch
 
@@ -10,7 +10,8 @@ def plot_history(history):
 	plt.xlabel('Epoch')
 	plt.ylabel('Mean Square Error [$MPG^2$]')
 	plt.plot(hist['epoch'], hist['mean_squared_error'], label='Train Error')
-	plt.plot(hist['epoch'], hist['val_mean_squared_error'], label='Validation Error')
+	if validation:
+		plt.plot(hist['epoch'], hist['val_mean_squared_error'], label='Validation Error')
 	plt.legend()
 	plt.ylim([0,5])
 	plt.show()

@@ -14,11 +14,10 @@ def load(filename):
 	return np.array(data)
 
 
-def split(data, train, validation, test):
+def split(data, split):
 	data_size = len(data)
-	train_size = int(data_size * train)
-	validation_size = int(data_size * validation)
-	return (data[:train_size], data[train_size:train_size+validation_size], data[train_size+validation_size:])
+	train_size = int(data_size * split)
+	return (data[:train_size], data[train_size:])
 
 
 def normalize(data):
