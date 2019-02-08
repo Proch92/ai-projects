@@ -46,7 +46,7 @@ class LSTM():
 				shuffle = False,
 				verbose=1)
 
-		self.save(os.path.join('models', modelname + '.h5'))
+		model.save(os.path.join('models', modelname + '.h5'))
 
 		return history
 

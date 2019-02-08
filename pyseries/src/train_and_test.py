@@ -6,7 +6,7 @@ import sys
 def main():
 	argv = sys.argv
 
-	if len(argv) != 2:
+	if len(argv) != 3:
 		print('Usage: ' + argv[0] + ' model_name dataset')
 		sys.exit(0)
 

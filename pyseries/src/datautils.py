@@ -28,33 +28,3 @@ def normalize(data):
 
 def denormalize(data, mean, std):
 	return np.vectorize(lambda p: (p * std) + mean) (data)
-
-
-def differentiate(data):
-	new = np.concatenate((np.zeros(1), data[:-1]))
-	return new - data
-
-
-def undifferentiate(data):
-	v = 0
-	ret = []
-	for d in data:
-		v = v + d
-		ret.append(v)
-	return ret
-
-
-def streamline(data):
-	if len(data) == 0:
-		return []
-
-	if len(data) == 1:
-		return data[0]
-
-	results = data[0].tolist()
-	data = data[1:]
-
-	for vec in data:
-		results.append(vec[-1])
-
-	return results
