@@ -38,3 +38,23 @@ def normalize(data):
 
 def denormalize(data, mean, std):
 	return np.vectorize(lambda p: (p * std) + mean) (data)
+
+
+def differentiate(data):
+	diff = []
+	prev = data[0]
+	for point in data:
+		diff.append(point - prev)
+		prev = point
+
+	return (diff, data[0])
+
+
+def undifferentiate(data, start):
+	undiff = []
+	prev = start
+	for point in data:
+		undiff.append(prev + point)
+		prev = prev + point
+
+	return undiff

@@ -26,7 +26,7 @@ def plot_data(sequence):
 	plt.show()
 
 
-def plot_multiple(sequences, shift = None):
+def plot_multiple(sequences, shift = None, vertical_lines=[]):
 	if not shift:
 		shift = [0] * len(sequences)
 
@@ -36,6 +36,8 @@ def plot_multiple(sequences, shift = None):
 	plt.figure()
 	plt.xlabel('Time')
 	plt.ylabel('Value')
+	for index in vertical_lines:
+		plt.axvline(x=index)
 	for i, sequence in enumerate(sequences):
 		plt.plot([t + shift[i] for t in range(len(sequence))], sequence)
 	plt.ylim([min_y, max_y])
