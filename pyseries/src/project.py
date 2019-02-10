@@ -22,7 +22,7 @@ def main():
 	"""plot"""
 	testset_denorm = datautils.denormalize(normalized, mean, std)
 	results_denorm = datautils.denormalize(projection, mean, std)
-	utils.plot_multiple([testset_denorm, results_denorm], [0, len(data)+1])
+	utils.plot_multiple([testset_denorm, results_denorm], [0, len(data)])
 
 if __name__ == '__main__':
 	main()

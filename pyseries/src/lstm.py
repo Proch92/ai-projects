@@ -65,15 +65,17 @@ class LSTM():
 
 		guided = model(input_tensor)
 		input_tensor = guided[:,-1:,:]
+		projection.append(tf.squeeze(input_tensor).numpy())
 		guided = tf.squeeze(guided).numpy()
 
-		for i in range(projection_length):
+		for i in range(projection_length-1):
 			output = model(input_tensor)
 			prediction = output[:,-1:,:]
 			projection.append(tf.squeeze(prediction).numpy())
 			input_tensor = prediction
 
 		return (guided, projection)
+
 
 	#####################################################
 	# 	(datalen)										#
@@ -117,10 +119,10 @@ class LSTM():
 		return (x, y)
 
 
-		def save(self, filename):
-			tf.keras.models.save_model(
-				model,
-				filepath,
-				overwrite=True,
-				include_optimizer=True
-			)
+	def save(self, filename):
+		tf.keras.models.save_model(
+			model,
+			filepath,
+			overwrite=True,
+			include_optimizer=True
+		)
