@@ -12,6 +12,7 @@ def main():
 
 	model_name = argv[1]
 	data = datautils.load(argv[2])
+
 	normalized, mean, std = datautils.normalize(data)
 	normalized, start = datautils.differentiate(normalized)
 	(train, test) = datautils.split(normalized, 0.7)
@@ -25,13 +26,13 @@ def main():
 	model = LSTM()
 	time_steps = 20 # window size
 	batch_size = 5 # data augmentation
-	history = model.train(model_name, train, 40, batch_size, time_steps)
+	history = model.train(model_name, train, 80, batch_size, time_steps)
 	utils.plot_history(history)
 
 	"""test"""
 	head = int(len(test) * 0.6)
 	tail = len(test) - head
-	(guided, projection) = model.evaluate(model_name, test[:head], tail)
+	projection = model.evaluate(model_name, test[:head], tail)
 	
 	"""plot"""
 	start_test = start + sum(train)

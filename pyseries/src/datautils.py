@@ -23,6 +23,7 @@ def split(data, split):
 	return (data[:train_size], data[train_size:])
 
 
+""" mu=0 and stdev=1 normalization """
 def normalize(data):
 	data_clean = np.extract(np.logical_not(np.isnan(data)), data)
 	mean = np.mean(data_clean)
@@ -40,6 +41,8 @@ def denormalize(data, mean, std):
 	return np.vectorize(lambda p: (p * std) + mean) (data)
 
 
+""" calc local derivative """
+""" [1,3,-4,6] -> [0,2,-7,10] """
 def differentiate(data):
 	diff = []
 	prev = data[0]

@@ -18,7 +18,7 @@ def main():
 
 	"""eval"""
 	model = LSTM()
-	(_, projection) = model.evaluate(model_name, diff, tail)
+	projection = model.evaluate(model_name, diff, tail)
 	
 	"""plot"""
 	testset_undiff = datautils.undifferentiate(diff, start)

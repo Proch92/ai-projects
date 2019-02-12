@@ -25,7 +25,7 @@ def main():
 	clean = np.empty(0)
 	for head, tail in eval_sequences:
 		head, start = datautils.differentiate(head)
-		(_, projection) = model.evaluate(model_name, head, tail)
+		projection = model.evaluate(model_name, head, tail)
 		head = datautils.undifferentiate(head, start)
 		projection = datautils.undifferentiate(projection, head[-1])
 		clean = np.concatenate((clean, head, projection))
@@ -34,6 +34,17 @@ def main():
 	clean_denorm = datautils.denormalize(clean, mean, std)
 	utils.plot_multiple([original_data, clean_denorm], [0, 0], vertical_lines=cuts_indexes)
 
+
+#############################################################
+# takes a sequence with empty values and returns a list		#
+# of objects in the form (sub sequence, projection length)	#
+# input:													#
+# [1,2,3,4,5,,,,3,4,5,6,,,2,3,4,5]							#
+# output:													#
+# [([1,2,3,4,5], 3),										#
+# ([3,4,5,6], 2)]											#
+# also returns indexes of cuts for plotting					#
+#############################################################
 
 def split_evaluation_sequences(data):
 	boolean_sequences = np.isnan(data)

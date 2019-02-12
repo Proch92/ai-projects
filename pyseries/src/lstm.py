@@ -60,17 +60,17 @@ class LSTM():
 		input_tensor = tf.expand_dims(input_tensor, 0) # adds batch dimension
 		input_tensor = tf.to_float(input_tensor)
 
-		model = self.model_definition(1)
+		model = self.model_definition(1) # batch size = 1
 		model.load_weights(os.path.join('models', modelname + '.h5'))
 		model.build(tf.TensorShape([1, None]))
 
 		projection = []
 		model.reset_states()
 
+		# forward passing in the entire test test to build a good memory state
 		guided = model(input_tensor)
 		input_tensor = guided[:,-1:,:]
 		projection.append(tf.squeeze(input_tensor).numpy())
-		guided = tf.squeeze(guided).numpy()
 
 		for i in range(projection_length-1):
 			output = model(input_tensor)
@@ -78,7 +78,7 @@ class LSTM():
 			projection.append(tf.squeeze(prediction).numpy())
 			input_tensor = prediction
 
-		return (guided, projection)
+		return projection
 
 
 	#####################################################
@@ -127,6 +127,5 @@ class LSTM():
 		tf.keras.models.save_model(
 			model,
 			filepath,
-			overwrite=True,
-			include_optimizer=True
+			overwrite=True
 		)
