@@ -8,12 +8,13 @@ import numpy as np
 def main():
 	argv = sys.argv
 
-	if len(argv) != 3:
-		print('Usage: ' + argv[0] + ' model_name dataset')
+	if len(argv) != 4:
+		print('Usage: ' + argv[0] + ' model_name dataset original_dataset')
 		sys.exit(0)
 
 	model_name = argv[1]
 	data = datautils.load(argv[2])
+	original_data = datautils.load(argv[3])
 	normalized, mean, std = datautils.normalize(data)
 
 	(eval_sequences, cuts_indexes) = split_evaluation_sequences(normalized)
@@ -21,17 +22,17 @@ def main():
 	"""eval"""
 	model = LSTM()
 
-	fixed = np.empty(0)
+	clean = np.empty(0)
 	for head, tail in eval_sequences:
-		head, start = differentiate(head)
+		head, start = datautils.differentiate(head)
 		(_, projection) = model.evaluate(model_name, head, tail)
-		head = undifferentiate(head, start)
-		projection = undifferentiate(projection, head[-1])
-		fixed = np.concatenate((fixed, head, projection))
+		head = datautils.undifferentiate(head, start)
+		projection = datautils.undifferentiate(projection, head[-1])
+		clean = np.concatenate((clean, head, projection))
 
 	"""plot"""
-	fixed_denorm = datautils.denormalize(fixed, mean, std)
-	utils.plot_multiple([data, fixed_denorm], [0, 0], vertical_lines=cuts_indexes)
+	clean_denorm = datautils.denormalize(clean, mean, std)
+	utils.plot_multiple([original_data, clean_denorm], [0, 0], vertical_lines=cuts_indexes)
 
 
 def split_evaluation_sequences(data):

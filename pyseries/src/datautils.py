@@ -54,7 +54,7 @@ def undifferentiate(data, start):
 	undiff = []
 	prev = start
 	for point in data:
-		undiff.append(prev + point)
 		prev = prev + point
+		undiff.append(prev)
 
 	return undiff
