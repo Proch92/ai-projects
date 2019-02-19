@@ -87,7 +87,7 @@ class LSTM():
 	# 	(batch_size, datalen)							#
 	# random rolls										#
 	# discard rolled points								#
-	# 	(batch_size, time_steps * num_cuts)				#
+	# 	(batch_size, time_steps * num_cuts + 1)			#
 	# expand dimension for LSTM							#
 	#	(batch_size, time_steps * num_cuts + 1, 1)		#
 	# decouple x and y									#
