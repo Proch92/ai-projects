@@ -21,11 +21,9 @@ def main():
 	projection = model.evaluate(model_name, diff, tail)
 	
 	"""plot"""
-	testset_undiff = datautils.undifferentiate(diff, start)
 	results_undiff = datautils.undifferentiate(projection, normalized[-1])
-	testset_denorm = datautils.denormalize(testset_undiff, mean, std)
 	results_denorm = datautils.denormalize(results_undiff, mean, std)
-	utils.plot_multiple([testset_denorm, results_denorm], [0, len(data)])
+	utils.plot_multiple([data, results_denorm], [0, len(data)])
 
 if __name__ == '__main__':
 	main()

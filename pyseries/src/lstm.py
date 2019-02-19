@@ -72,7 +72,7 @@ class LSTM():
 		input_tensor = guided[:,-1:,:]
 		projection.append(tf.squeeze(input_tensor).numpy())
 
-		for i in range(projection_length-1):
+		for i in range(projection_length - 1):
 			output = model(input_tensor)
 			prediction = output[:,-1:,:]
 			projection.append(tf.squeeze(prediction).numpy())

@@ -14,7 +14,7 @@ def main():
 	data = datautils.load(argv[2])
 
 	normalized, mean, std = datautils.normalize(data)
-	normalized, start = datautils.differentiate(normalized)
+	normalized = datautils.differentiate(normalized)
 	(train, test) = datautils.split(normalized, 0.7)
 	
 	# utils.plot_data(data)
@@ -26,7 +26,7 @@ def main():
 	model = LSTM()
 	time_steps = 20 # window size
 	batch_size = 5 # data augmentation
-	history = model.train(model_name, train, 80, batch_size, time_steps)
+	history = model.train(model_name, train, 130, batch_size, time_steps)
 	utils.plot_history(history)
 
 	"""test"""
@@ -35,10 +35,8 @@ def main():
 	projection = model.evaluate(model_name, test[:head], tail)
 	
 	"""plot"""
-	start_test = start + sum(train)
-	start_projection = start_test + sum(test)
-	test = datautils.undifferentiate(test, start_test)
-	projection = datautils.undifferentiate(projection, start_projection)
+	test = datautils.undifferentiate(test, sum(train))
+	projection = datautils.undifferentiate(projection, sum(train) + sum(test))
 	testset_denorm = datautils.denormalize(test, mean, std)
 	results_denorm = datautils.denormalize(projection, mean, std)
 	utils.plot_multiple([testset_denorm, results_denorm], [0, head+1])
