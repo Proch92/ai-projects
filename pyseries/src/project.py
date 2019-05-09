@@ -14,7 +14,7 @@ def main():
 	data = datautils.load(argv[2])
 	tail = int(argv[3])
 	normalized, mean, std = datautils.normalize(data)
-	diff, start = datautils.differentiate(normalized)
+	diff = datautils.differentiate(normalized)
 
 	"""eval"""
 	model = LSTM()
