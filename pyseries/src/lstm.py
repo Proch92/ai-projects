@@ -17,6 +17,7 @@ class LSTM():
 		return tf.keras.Sequential([
 			tf.keras.layers.LSTM(
 					120,
+					#40,
 					dropout=0.2,
 					recurrent_dropout=0.2,
 					return_sequences = True,
@@ -24,6 +25,7 @@ class LSTM():
 					batch_input_shape = (batch_size, None, 1)),
 			tf.keras.layers.LSTM(
 					60,
+					#20,
 					dropout=0.2,
 					recurrent_dropout=0.2,
 					return_sequences = True,

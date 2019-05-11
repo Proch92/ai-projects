@@ -42,15 +42,15 @@ def denormalize(data, mean, std):
 
 
 """ calc local derivative """
-""" [1,3,-4,6] -> [1,2,-7,10] """
-def differentiate(data, start=0):
-    diff = []
-    prev = start
-    for point in data:
-        diff.append(point - prev)
-        prev = point
+""" [1,3,-4,6] -> [0,2,-7,10] """
+def differentiate(data):
+	diff = []
+	prev = data[0]
+	for point in data:
+		diff.append(point - prev)
+		prev = point
 
-    return diff
+	return diff
 
 
 def undifferentiate(data, start):
