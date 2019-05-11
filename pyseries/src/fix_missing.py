@@ -24,10 +24,17 @@ def main():
 
 	clean = np.empty(0)
 	for head, tail in eval_sequences:
-		head, start = datautils.differentiate(head)
-		projection = model.evaluate(model_name, head, tail)
-		head = datautils.undifferentiate(head, start)
+		if len(clean) == 0:
+			y_init = 0
+		else:
+			y_init = clean[-1]
+		head_diff = datautils.differentiate(head, y_init)
+
+		projection = model.evaluate(model_name, head_diff, tail)
+
+		head = datautils.undifferentiate(head_diff, y_init)
 		projection = datautils.undifferentiate(projection, head[-1])
+
 		clean = np.concatenate((clean, head, projection))
 
 	"""plot"""
