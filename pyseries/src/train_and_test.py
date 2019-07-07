@@ -24,9 +24,9 @@ def main():
 
 	"""train"""
 	model = LSTM()
-	time_steps = 20 # window size
+	time_steps = 40 # window size
 	batch_size = 4 # data augmentation
-	history = model.train(model_name, train, 150, batch_size, time_steps)
+	history = model.train(model_name, train, 1000, batch_size, time_steps)
 	utils.plot_history(history)
 
 	"""test"""

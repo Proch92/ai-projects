@@ -16,7 +16,7 @@ class LSTM():
 	def model_definition(self, batch_size):
 		return tf.keras.Sequential([
 			tf.keras.layers.LSTM(
-					120,
+					200,
 					#40,
 					dropout=0.2,
 					recurrent_dropout=0.2,
@@ -24,7 +24,14 @@ class LSTM():
 					stateful = True,
 					batch_input_shape = (batch_size, None, 1)),
 			tf.keras.layers.LSTM(
-					60,
+					100,
+					#20,
+					dropout=0.2,
+					recurrent_dropout=0.2,
+					return_sequences = True,
+					stateful = True),
+			tf.keras.layers.LSTM(
+					30,
 					#20,
 					dropout=0.2,
 					recurrent_dropout=0.2,
