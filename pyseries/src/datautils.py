@@ -1,11 +1,10 @@
 import csv
 import numpy as np
-import os
 
 
 def load(filename):
     data = []
-    with open(os.path.join('data', filename), "r") as csvfile:
+    with open(filename, "r") as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         for row in reader:
             for token in row:
@@ -23,7 +22,6 @@ def split(data, split):
     return (data[:train_size], data[train_size:])
 
 
-""" mu=0 and stdev=1 normalization """
 def normalize(data):
     data_clean = np.extract(np.logical_not(np.isnan(data)), data)
     mean = np.mean(data_clean)
@@ -41,16 +39,14 @@ def denormalize(data, mean, std):
     return np.vectorize(lambda p: (p * std) + mean)(data)
 
 
-""" calc local derivative """
-""" [1,3,-4,6] -> [0,2,-7,10] """
 def differentiate(data):
-	diff = []
-	prev = data[0]
-	for point in data:
-		diff.append(point - prev)
-		prev = point
+    diff = []
+    prev = data[0]
+    for point in data:
+        diff.append(point - prev)
+        prev = point
 
-	return diff
+    return diff
 
 
 def undifferentiate(data, start):
