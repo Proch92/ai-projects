@@ -8,18 +8,28 @@ class LSTM():
         return tf.keras.Sequential([
             tf.keras.layers.LSTM(
                 400,
-                dropout=0.4,
+                dropout=0.3,
                 return_sequences=True,
                 stateful=True,
                 batch_input_shape=(batch_size, None, 1)),
             tf.keras.layers.LSTM(
                 200,
-                dropout=0.4,
+                dropout=0.3,
+                return_sequences=True,
+                stateful=True),
+            tf.keras.layers.LSTM(
+                200,
+                dropout=0.3,
+                return_sequences=True,
+                stateful=True),
+            tf.keras.layers.LSTM(
+                200,
+                dropout=0.3,
                 return_sequences=True,
                 stateful=True),
             tf.keras.layers.LSTM(
                 60,
-                dropout=0.4,
+                dropout=0.3,
                 return_sequences=True,
                 stateful=True),
             tf.keras.layers.Dense(1)
