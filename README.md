@@ -6,11 +6,11 @@ Data points represents jewellery sales over the months (December shows high sale
 The projection in orange is made over the testset after some wind-up data points.
 
 
-<img src="docs/pyseries/jewellery.png" width="300"/>
+<img src="pyseries/docs/jewellery.png" width="300"/>
 
 
 Other examples:
 
 
-<img src="docs/pyseries/es2_10k.png" width="300"/>
-<img src="docs/pyseries/mintemp_torre.png" width="300"/>
+<img src="pyseries/docs/es2_10k.png" width="300"/>
+<img src="pyseries/docs/mintemp_torre.png" width="300"/>
